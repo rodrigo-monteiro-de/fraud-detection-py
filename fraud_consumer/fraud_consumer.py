@@ -1,6 +1,29 @@
 from kafka import KafkaConsumer
 import json
 
+from rules import (
+    high_amount_rule,
+    suspicious_country_rule,
+    suspicious_hour_rule
+)
+
+def detect_fraud(transaction):
+    rules = [
+        high_amount_rule,
+        suspicious_country_rule,
+        suspicious_hour_rule        
+        ]
+        
+    alerts = []
+    
+    for rule in rules:
+        result = rule(transaction)
+        
+        if result:
+            alerts.append(result)
+            
+    return
+
 consumer = KafkaConsumer(
     "transaction-events", #topic
     bootstrap_servers="localhost:9092",
@@ -14,14 +37,14 @@ consumer = KafkaConsumer(
 print("Aguardando transações...")
 
 for message in consumer:
-    transaction = message.value
+    transaction = json.loads(message.value)  # kafka entrega dicionario Python
+    
+    print(f"\nTransação recebida {transaction}")
+    
+    alerts = detect_fraud(transaction)
 
-    print("\nTransação recebida")
-    print(transaction)
-
-    if transaction["amount"] > 1000:
-        print(f"Fraud detected - High amount: ${transaction['amount']}")
-        
-        
-    if transaction.get("country") in ["RU", "KP"]:
-        print(f"Fraud detected - Suspicious country: ${transaction['country']}")
+    if alerts:
+        print(f"Fraud detected:{', '.join(alerts)}")
+    else:
+        print("Transaction aproved")
+    
