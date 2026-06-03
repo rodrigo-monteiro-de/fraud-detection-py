@@ -14,4 +14,6 @@ def suspicious_country_rule(transaction):
 def suspicious_hour_rule(transaction):
     if transaction["hour"] > 0 and transaction["hour"] <= 5:
         return f"Transaction at unusual hour: {transaction['hour']}h"
+    
+    return None
         

@@ -22,7 +22,7 @@ def detect_fraud(transaction):
         if result:
             alerts.append(result)
             
-    return
+    return alerts
 
 consumer = KafkaConsumer(
     "transaction-events", #topic
@@ -37,14 +37,20 @@ consumer = KafkaConsumer(
 print("Aguardando transações...")
 
 for message in consumer:
-    transaction = json.loads(message.value)  # kafka entrega dicionario Python
+    transaction = message.value
     
     print(f"\nTransação recebida {transaction}")
     
     alerts = detect_fraud(transaction)
 
     if alerts:
-        print(f"Fraud detected:{', '.join(alerts)}")
+        print("=" * 50)
+        print(f"Transaction ID: {transaction['transaction_id']}")
+        print("=" * 50)
+        print("\n FRAUD ALERT")
+
+        for alert in alerts:
+            print(f"- {alert}")
     else:
-        print("Transaction aproved")
+        print("\nTransaction approved")
     
