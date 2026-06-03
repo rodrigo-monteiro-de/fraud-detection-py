@@ -1,5 +1,6 @@
 from kafka import KafkaProducer
 from faker import Faker
+from datetime import datetime
 import json
 import time
 import random
@@ -27,7 +28,7 @@ merchants = [
     "Netflix"
 ]
 
-payment_methods = [
+payment_method = [
     "CREDIT_CARD",
     "PIX",
     "DEBIT_CARD"
@@ -43,7 +44,8 @@ while True:
         "amount":random.randint(100,20000),
         "country":random.choice(countries),
         "merchant":random.choice(merchants),
-        "payment_methods":random.choice(payment_methods)
+        "payment_method":random.choice(payment_method),
+        "hour":datetime.now().hour
     }
     
     producer.send(
